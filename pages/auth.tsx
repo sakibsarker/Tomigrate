@@ -1,10 +1,8 @@
-import axios from 'axios';
-import { useCallback, useState } from 'react';
-import { NextPageContext } from 'next';
-import { getSession, signIn } from 'next-auth/react';
+import { useState, useCallback } from 'react';
+import { getSession, signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { FcGoogle } from 'react-icons/fc';
-import { FaGithub } from 'react-icons/fa';
+// import { FcGoogle } from 'react-icons/fc';
+// import { FaGithub } from 'react-icons/fa';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -12,64 +10,66 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useRegisterUserMutation } from '@/slices/apiSlice';
 
-export async function getServerSideProps(context: NextPageContext) {
+export async function getServerSideProps(context:any) {
   const session = await getSession(context);
-
   if (session) {
     return {
       redirect: {
         destination: '/',
         permanent: false,
-      }
+      },
     };
   }
-
   return {
-    props: {}
+    props: {},
   };
 }
 
 const Auth = () => {
   const router = useRouter();
+  const { data: session } = useSession(); // Added useSession hook
 
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [variant, setVariant] = useState('login');
 
+  const [registerUser] = useRegisterUserMutation();
+
   const toggleVariant = useCallback(() => {
-    setVariant((currentVariant) => currentVariant === 'login' ? 'register' : 'login');
+    setVariant((currentVariant) => (currentVariant === 'login' ? 'register' : 'login'));
   }, []);
 
   const login = useCallback(async () => {
-    try {
-      await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: '/'
-      });
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+      callbackUrl: '/',
+    });
 
+    if (result?.error) {
+      console.log('Error logging in:', result.error);
+    } else {
       router.push('/');
-    } catch (error) {
-      console.log(error);
     }
   }, [email, password, router]);
 
   const register = useCallback(async () => {
     try {
-      await axios.post('/api/register', {
-        email,
-        name,
-        password
-      });
-
+      await registerUser({ email, name, password });
       login();
     } catch (error) {
       console.log(error);
     }
-  }, [email, name, password, login]);
+  }, [email, name, password, registerUser, login]);
+
+  // Automatically redirect if session exists
+  if (session) {
+    router.push('/');
+  }
 
   return (
     <ThemeProvider theme={createTheme()}>
@@ -128,12 +128,12 @@ const Auth = () => {
             </Button>
             
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2%' }}>
-              <Button onClick={() => signIn('google', { callbackUrl: '/' })}>
+              {/* <Button onClick={() => signIn('google', { callbackUrl: '/' })}>
                 <FcGoogle size={24} />
               </Button>
               <Button onClick={() => signIn('github', { callbackUrl: '/' })} style={{ marginLeft: '2%' }}>
                 <FaGithub size={24} />
-              </Button>
+              </Button> */}
             </div>
             
             <Typography align="center" style={{ marginTop: '5%' }}>
