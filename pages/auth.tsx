@@ -99,7 +99,7 @@ const Auth = () => {
               fullWidth
               id="email"
               type="email"
-              label="Email address or phone number"
+              label="Email "
               value={email}
               onChange={(e: any) => setEmail(e.target.value)}
               variant="outlined"
