@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
 import { getSession, signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-// import { FcGoogle } from 'react-icons/fc';
-// import { FaGithub } from 'react-icons/fa';
+import GoogleIcon from '@mui/icons-material/Google';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -128,12 +127,10 @@ const Auth = () => {
             </Button>
             
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2%' }}>
-              {/* <Button onClick={() => signIn('google', { callbackUrl: '/' })}>
-                <FcGoogle size={24} />
+              <Button onClick={() => signIn('google', { callbackUrl: '/' })}>
+                <GoogleIcon/>
               </Button>
-              <Button onClick={() => signIn('github', { callbackUrl: '/' })} style={{ marginLeft: '2%' }}>
-                <FaGithub size={24} />
-              </Button> */}
+             
             </div>
             
             <Typography align="center" style={{ marginTop: '5%' }}>
