@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { signOut } from 'next-auth/react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,10 +9,17 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import useCurrentUser from '@/hooks/useCurrentUser';
+import { useGetCurrentUserQuery } from '@/slices/apiSlice';
 
 const Navbar = () => {
-  const { data: currentUser } = useCurrentUser();
+  const dispatch = useDispatch();
+  
+  // Use the RTK Query hook to fetch the current user
+  const { data: currentUser, isLoading, isError } = useGetCurrentUserQuery();
+  
+  // Or, if you store the user in Redux state after fetching:
+  // const currentUser = useSelector((state: RootState) => state.auth.user);
+  
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -22,6 +30,10 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  // Handling loading or error states might be useful.
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error fetching user</p>;
+
   return (
     <AppBar position="fixed" color="default">
       <Toolbar>
@@ -29,7 +41,8 @@ const Navbar = () => {
 
         <div style={{ marginLeft: 'auto' }}>
           <IconButton onClick={handleMenuOpen} edge="end">
-            <Avatar src="/images/default-blue.png" alt="" />
+          <Avatar alt="avatar" />
+            {/* <Avatar src="/images/default-blue.png" alt="" /> */}
             <ExpandMoreIcon />
           </IconButton>
 
@@ -57,3 +70,4 @@ const Navbar = () => {
 }
 
 export default Navbar;
+
